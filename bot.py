@@ -2,6 +2,13 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 import config
 from handlers import convert, explain, run, admin, decode, optimize, syntax_checker
+from handlers.convert import convert_code
+from handlers.explain import explain_code
+from handlers.run import run_code
+from handlers.optimize import optimize_code
+from handlers.syntax_checker import check_syntax
+from handlers.decode import decode_base64, decode_hex
+from handlers.admin import admin_command
 
 # Start command handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,72 +47,49 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data in responses:
         await query.message.reply_text(responses[data])
 
-# Convert handler
 async def process_convert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, from_lang, to_lang, code = update.message.text.split(" ", 3)
-        converted_code = await convert.convert_code(code, from_lang, to_lang)
+        converted_code = await convert_code(code, from_lang, to_lang)
         await update.message.reply_text(f"🔄 *Converted Code:*\n```{converted_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")
-
-# Explain handler
-async def process_explain(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")async def process_explain(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
-        explanation = await explain.explain_code(code)
+        explanation = await explain_code(code)
         await update.message.reply_text(f"📖 *Explanation:*\n```{explanation}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")
-
-# Run handler
-async def process_run(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")async def process_run(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
-        output = await run.run_code(language, code)
+        output = await run_code(language, code)
         await update.message.reply_text(f"🚀 *Output:*\n```{output}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")
-
-# Optimize handler
-async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
-        optimized_code = await optimize.optimize_code(code)
+        optimized_code = await optimize_code(code)
         await update.message.reply_text(f"🔧 *Optimized Code:*\n```{optimized_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")
-
-# Syntax check handler
-async def process_syntax(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")async def process_syntax(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
-        fixed_code = await syntax_checker.check_syntax(code, language)
+        fixed_code = await check_syntax(code, language)
         await update.message.reply_text(f"✅ *Fixed Code:*\n```{fixed_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")
-
-# Decode handler
-async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, encoding, text = update.message.text.split(" ", 2)
         if encoding.lower() == "base64":
-            decoded_text = await decode.decode_base64(text)
+            decoded_text = await decode_base64(text)
         elif encoding.lower() == "hex":
-            decoded_text = await decode.decode_hex(text)
+            decoded_text = await decode_hex(text)
         else:
             decoded_text = "❌ Unsupported encoding."
         await update.message.reply_text(f"📜 *Decoded Text:*\n```{decoded_text}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")
-
-# Admin handler
-async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await admin.admin_command(update, context)
-
-# Main function
-def main():
-    app = Application.builder().token(config.BOT_TOKEN).build()
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await admin_command(update, context)
 
     # Register command handlers
     app.add_handler(CommandHandler("start", start))
