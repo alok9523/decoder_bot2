@@ -3,8 +3,6 @@ python-telegram-bot
 aiogram  # (Alternative async Telegram bot framework)
 python-telegram-bot==13.15  # Telegram bot API
 requests==2.31.0  # API calls for GPT-4o
-pygments==2.16.1  # Syntax highlighting for code
-execjs==1.5.0  # Running JavaScript code
-pyexecjs==1.5.1  # Alternative JS execution support
+pygments==2.16.1  # Syntax highlighting for co
 flask==3.0.0  # Optional: If you plan to add a web interface
 subprocess32==3.5.4  # Running shell commands (for executing code)
