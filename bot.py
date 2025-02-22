@@ -1,10 +1,10 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 import config
 from handlers import convert, explain, run, admin, decode, optimize, syntax_checker
 
 # Start command handler
-def start(update: Update, context: CallbackContext):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🛠 Convert Code", callback_data="convert")],
         [InlineKeyboardButton("📖 Explain Code", callback_data="explain")],
@@ -20,99 +20,108 @@ def start(update: Update, context: CallbackContext):
 👤 *Owner:* `{config.OWNER_NAME}`  
 🔹 _Use the buttons below to access features._  
 """
-    update.message.reply_text(message, parse_mode="Markdown", reply_markup=reply_markup)
+    await update.message.reply_text(message, parse_mode="Markdown", reply_markup=reply_markup)
 
-# Convert command
-def convert_handler(update: Update, context: CallbackContext):
-    update.message.reply_text("Send me code with the format:\n`/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")
+# Handle button clicks
+async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
 
-def process_convert(update: Update, context: CallbackContext):
+    responses = {
+        "convert": "Send me code with `/convert <from_lang> <to_lang> <code>`",
+        "explain": "Send me code with `/explain <code>`",
+        "run": "Send me code with `/run <language> <code>`",
+        "optimize": "Send me code with `/optimize <code>`",
+        "syntax": "Send me code with `/syntax <language> <code>`",
+        "decode": "Send me code with `/decode <base64|hex> <text>`",
+    }
+    
+    if data in responses:
+        await query.message.reply_text(responses[data])
+
+# Convert handler
+async def process_convert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, from_lang, to_lang, code = update.message.text.split(" ", 3)
-        converted_code = convert.convert_code(code, from_lang, to_lang)
-        update.message.reply_text(f"🔄 *Converted Code:*\n```{converted_code}```", parse_mode="Markdown")
+        converted_code = await convert.convert_code(code, from_lang, to_lang)
+        await update.message.reply_text(f"🔄 *Converted Code:*\n```{converted_code}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")
 
-# Explain command
-def explain_handler(update: Update, context: CallbackContext):
-    update.message.reply_text("Send me the code to explain:\n`/explain <code>`", parse_mode="Markdown")
-
-def process_explain(update: Update, context: CallbackContext):
+# Explain handler
+async def process_explain(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
-        explanation = explain.explain_code(code)
-        update.message.reply_text(f"📖 *Explanation:*\n```{explanation}```", parse_mode="Markdown")
+        explanation = await explain.explain_code(code)
+        await update.message.reply_text(f"📖 *Explanation:*\n```{explanation}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")
 
-# Run command
-def run_handler(update: Update, context: CallbackContext):
-    update.message.reply_text("Send me the code to run:\n`/run <language> <code>`", parse_mode="Markdown")
-
-def process_run(update: Update, context: CallbackContext):
+# Run handler
+async def process_run(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
-        output = run.run_code(language, code)
-        update.message.reply_text(f"🚀 *Output:*\n```{output}```", parse_mode="Markdown")
+        output = await run.run_code(language, code)
+        await update.message.reply_text(f"🚀 *Output:*\n```{output}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")
 
-# Optimize command
-def process_optimize(update: Update, context: CallbackContext):
+# Optimize handler
+async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
-        optimized_code = optimize.optimize_code(code)
-        update.message.reply_text(f"🔧 *Optimized Code:*\n```{optimized_code}```", parse_mode="Markdown")
+        optimized_code = await optimize.optimize_code(code)
+        await update.message.reply_text(f"🔧 *Optimized Code:*\n```{optimized_code}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")
 
-# Syntax check command
-def process_syntax(update: Update, context: CallbackContext):
+# Syntax check handler
+async def process_syntax(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
-        fixed_code = syntax_checker.check_syntax(code, language)
-        update.message.reply_text(f"✅ *Fixed Code:*\n```{fixed_code}```", parse_mode="Markdown")
+        fixed_code = await syntax_checker.check_syntax(code, language)
+        await update.message.reply_text(f"✅ *Fixed Code:*\n```{fixed_code}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")
 
-# Decode command
-def process_decode(update: Update, context: CallbackContext):
+# Decode handler
+async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, encoding, text = update.message.text.split(" ", 2)
         if encoding.lower() == "base64":
-            decoded_text = decode.decode_base64(text)
+            decoded_text = await decode.decode_base64(text)
         elif encoding.lower() == "hex":
-            decoded_text = decode.decode_hex(text)
+            decoded_text = await decode.decode_hex(text)
         else:
             decoded_text = "❌ Unsupported encoding."
-        update.message.reply_text(f"📜 *Decoded Text:*\n```{decoded_text}```", parse_mode="Markdown")
+        await update.message.reply_text(f"📜 *Decoded Text:*\n```{decoded_text}```", parse_mode="Markdown")
     except:
-        update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")
 
-# Admin command
-def admin_handler(update: Update, context: CallbackContext):
-    admin.admin_command(update, context)
+# Admin handler
+async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await admin.admin_command(update, context)
 
-# Registering handlers
+# Main function
 def main():
-    updater = Updater(token=config.BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
+    app = Application.builder().token(config.BOT_TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("convert", convert_handler))
-    dp.add_handler(MessageHandler(Filters.regex(r"^/convert "), process_convert))
-    dp.add_handler(CommandHandler("explain", explain_handler))
-    dp.add_handler(MessageHandler(Filters.regex(r"^/explain "), process_explain))
-    dp.add_handler(CommandHandler("run", run_handler))
-    dp.add_handler(MessageHandler(Filters.regex(r"^/run "), process_run))
-    dp.add_handler(CommandHandler("optimize", process_optimize))
-    dp.add_handler(CommandHandler("syntax", process_syntax))
-    dp.add_handler(CommandHandler("decode", process_decode))
-    dp.add_handler(CommandHandler("admin", admin_handler))
+    # Register command handlers
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("convert", process_convert))
+    app.add_handler(CommandHandler("explain", process_explain))
+    app.add_handler(CommandHandler("run", process_run))
+    app.add_handler(CommandHandler("optimize", process_optimize))
+    app.add_handler(CommandHandler("syntax", process_syntax))
+    app.add_handler(CommandHandler("decode", process_decode))
+    app.add_handler(CommandHandler("admin", admin_handler))
 
-    updater.start_polling()
-    updater.idle()
+    # Register callback query handler for buttons
+    app.add_handler(CallbackQueryHandler(button_click))
+
+    # Run the bot
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
