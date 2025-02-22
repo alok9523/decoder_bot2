@@ -53,19 +53,24 @@ async def process_convert(update: Update, context: ContextTypes.DEFAULT_TYPE):
         converted_code = await convert_code(code, from_lang, to_lang)
         await update.message.reply_text(f"🔄 *Converted Code:*\n```{converted_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")async def process_explain(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/convert <from_lang> <to_lang> <code>`", parse_mode="Markdown")
+async def process_explain(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
         explanation = await explain_code(code)
         await update.message.reply_text(f"📖 *Explanation:*\n```{explanation}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")async def process_run(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/explain <code>`", parse_mode="Markdown")      
+
+async def process_run(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
         output = await run_code(language, code)
         await update.message.reply_text(f"🚀 *Output:*\n```{output}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/run <language> <code>`", parse_mode="Markdown")
+        
+async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, code = update.message.text.split(" ", 1)
         optimized_code = await optimize_code(code)
@@ -77,7 +82,9 @@ async def process_convert(update: Update, context: ContextTypes.DEFAULT_TYPE):
         fixed_code = await check_syntax(code, language)
         await update.message.reply_text(f"✅ *Fixed Code:*\n```{fixed_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/syntax <language> <code>`", parse_mode="Markdown")
+        
+async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, encoding, text = update.message.text.split(" ", 2)
         if encoding.lower() == "base64":
@@ -88,7 +95,9 @@ async def process_convert(update: Update, context: ContextTypes.DEFAULT_TYPE):
             decoded_text = "❌ Unsupported encoding."
         await update.message.reply_text(f"📜 *Decoded Text:*\n```{decoded_text}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")
+       
+qasync def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await admin_command(update, context)
 
     # Register command handlers
