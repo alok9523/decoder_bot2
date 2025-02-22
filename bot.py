@@ -76,7 +76,9 @@ async def process_optimize(update: Update, context: ContextTypes.DEFAULT_TYPE):
         optimized_code = await optimize_code(code)
         await update.message.reply_text(f"🔧 *Optimized Code:*\n```{optimized_code}```", parse_mode="Markdown")
     except:
-        await update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")async def process_syntax(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("❌ *Error:* Invalid format. Use `/optimize <code>`", parse_mode="Markdown")
+        
+async def process_syntax(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _, language, code = update.message.text.split(" ", 2)
         fixed_code = await check_syntax(code, language)
