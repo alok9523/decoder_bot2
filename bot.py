@@ -101,6 +101,9 @@ async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
        
 async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await admin_command(update, context)
+    
+def main():
+    app = Application.builder().token(config.BOT_TOKEN).build()
 
     # Register command handlers
     app.add_handler(CommandHandler("start", start))
