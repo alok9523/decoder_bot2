@@ -99,7 +99,7 @@ async def process_decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         await update.message.reply_text("❌ *Error:* Invalid format. Use `/decode <base64|hex> <text>`", parse_mode="Markdown")
        
-qasync def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await admin_command(update, context)
 
     # Register command handlers
