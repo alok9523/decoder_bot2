@@ -1,0 +1,4 @@
+requests
+python-telegram-bot
+aiogram  # (Alternative async Telegram bot framework)
+sqlite3  # (For lightweight database storage)
